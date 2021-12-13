@@ -43,6 +43,10 @@ const invokeAction = async ({ action, id, name, email, phone }) => {
 
     case 'remove':
       const removeById = await removeContact(id);
+      if (!removeById) {
+        console.log(chalk.red(`Contact with id: ${id} not found`));
+        return;
+      }
       console.log(chalk.green(`Contact ${id} remove`));
       break;
 
