@@ -5,7 +5,8 @@ const {
   getContactById,
   removeContact,
   addContact,
-} = require('./contact');
+} = require('./controllers/operations');
+
 const program = new Command();
 program
   .requiredOption('-a, --action <type>', 'choose action')
@@ -27,12 +28,13 @@ const invokeAction = async ({ action, id, name, email, phone }) => {
 
     case 'get':
       const contactById = await getContactById(id);
-      if (contactById) {
-        console.log(chalk.green('Contact found'));
-        console.log(contactById);
-        return;
-      }
-      console.log(chalk.yellow('Contact not found'));
+      contactById
+        ? console.log(
+            chalk.green(
+              `Contact found: ${contactById.name} ${contactById.phone} ${contactById.email}`
+            )
+          )
+        : console.log(chalk.yellow('Contact not found'));
       break;
 
     case 'add':
@@ -43,18 +45,16 @@ const invokeAction = async ({ action, id, name, email, phone }) => {
 
     case 'remove':
       const removeById = await removeContact(id);
-      if (!removeById) {
-        console.log(chalk.red(`Contact with id: ${id} not found`));
-        return;
-      }
-      console.log(chalk.green(`Contact ${id} remove`));
+      removeById
+        ? console.log(chalk.green(`Contact with id: ${id} remove`))
+        : console.log(chalk.red(`Contact with id: ${id} not found`));
       break;
 
     default:
       console.warn(chalk.red('Unknown action type!'));
   }
 };
-
-invokeAction(argv).then(() => {
+(async () => {
+  await invokeAction(argv);
   console.log(chalk.bgGreen('Operations success'));
-});
+})();
